@@ -48,7 +48,8 @@
   <component name="ChangeListManager">
     <list default="true" id="ce3f2170-1c08-43cd-91b9-91119b34a488" name="变更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/hero_chassis_controller.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/hero_chassis_controller.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hero_chassis_controller.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/hero_chassis_controller.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,6 +62,10 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/include/hero_chassis_controller.h" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/src/hero_chassis_controller.cpp" root0="SKIP_INSPECTION" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -275,7 +280,7 @@
       <workItem from="1672323265038" duration="22000" />
       <workItem from="1672323487187" duration="9000" />
       <workItem from="1672323538405" duration="860000" />
-      <workItem from="1672324573146" duration="1297000" />
+      <workItem from="1672324573146" duration="4040000" />
     </task>
     <servers />
   </component>
