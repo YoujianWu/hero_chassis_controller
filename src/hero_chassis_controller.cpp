@@ -122,6 +122,69 @@ namespace hero_chassis_controller{
         vel_wheel_exp[3] = ( Vx - Vy + Vw * ( Wheel_base + Wheel_track )/2 )/ Wheel_R;
         vel_wheel_exp[4] = ( Vx + Vy + Vw * ( Wheel_base + Wheel_track )/2 )/ Wheel_R;
     }
+    void HeroChassisController::compute_chassis_vel() {
+        Vx_chassis = ( vel_wheel_act[1] + vel_wheel_act[2] + vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R * 2;
+        Vy_chassis = (-vel_wheel_act[1] + vel_wheel_act[2] - vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R * 2;
+        Vw_chassis = (-vel_wheel_act[1] - vel_wheel_act[2] + vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R * 2 / (Wheel_track + Wheel_base);
+    }
+    void HeroChassisController::odometer() {
+
+        current_time = ros::Time::now();
+        last_time = ros::Time::now();
+
+        compute_chassis_vel();
+
+        current_time = ros::Time::now();
+
+        //compute odometry in a typical way given the velocities of the robot
+        double dt = (current_time - last_time).toSec();
+        double delta_x = (Vx_chassis * cos(th) - Vy_chassis * sin(th)) * dt;
+        double delta_y = (Vx_chassis * sin(th) + Vy_chassis * cos(th)) * dt;
+        double delta_th = Vw_chassis * dt;
+
+        x += delta_x;
+        y += delta_y;
+        th += delta_th;
+
+        //since all odometry is 6DOF we'll need a quaternion created from yaw
+        geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
+
+        //first, we'll publish the transform over tf
+        geometry_msgs::TransformStamped odom_trans;
+        odom_trans.header.stamp = current_time;
+        odom_trans.header.frame_id = "odom";
+        odom_trans.child_frame_id = "base_link";
+
+        odom_trans.transform.translation.x = x;
+        odom_trans.transform.translation.y = y;
+        odom_trans.transform.translation.z = 0.0;
+        odom_trans.transform.rotation = odom_quat;
+
+        //send the transform
+        odom_broadcaster.sendTransform(odom_trans);
+
+        //next, we'll publish the odometry message over ROS
+        nav_msgs::Odometry odom;
+        odom.header.stamp = current_time;
+        odom.header.frame_id = "odom";
+
+        //set the position
+        odom.pose.pose.position.x = x;
+        odom.pose.pose.position.y = y;
+        odom.pose.pose.position.z = 0.0;
+        odom.pose.pose.orientation = odom_quat;
+
+        //set the velocity
+        odom.child_frame_id = "base_link";
+        odom.twist.twist.linear.x = Vx_chassis;
+        odom.twist.twist.linear.y = Vy_chassis;
+        odom.twist.twist.angular.z = Vw_chassis;
+
+        //publish the message
+        odom_pub.publish(odom);
+
+        last_time = current_time;
+    }
 
 
 }//namespace
