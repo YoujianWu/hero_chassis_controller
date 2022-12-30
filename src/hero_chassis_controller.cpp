@@ -14,6 +14,10 @@ namespace hero_chassis_controller{
     bool HeroChassisController::init(hardware_interface::EffortJointInterface *effort_joint_interface,
                                      ros::NodeHandle &root_nh, ros::NodeHandle &controller_nh) {
 
+        //get parameter through the NodeHandle
+        controller_nh.getParam("Wheel_track",Wheel_track);
+        controller_nh.getParam("Wheel_base",Wheel_base);
+
 
         //get joint information and handle from hardware_interface
         front_left_joint_ =
@@ -26,11 +30,10 @@ namespace hero_chassis_controller{
                 effort_joint_interface->getHandle("right_back_wheel_joint");
 
         //load PID controllers
-        pid_controller_1.init(controller_nh,"pid_1");
-        pid_controller_2.init(controller_nh,"pid_2");
-        pid_controller_3.init(controller_nh,"pid_3");
-        pid_controller_4.init(controller_nh,"pid_4");
-
+        pid_controller_1.init(ros::NodeHandle(controller_nh,"pid_1"));
+        pid_controller_2.init(ros::NodeHandle(controller_nh,"pid_2"));
+        pid_controller_3.init(ros::NodeHandle(controller_nh,"pid_3"));
+        pid_controller_4.init(ros::NodeHandle(controller_nh,"pid_4"));
         //Initialiaze velocitizes
         Vx=0.0;
         Vy=0.0;
