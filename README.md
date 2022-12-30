@@ -29,6 +29,12 @@ research code, expect that it changes often and any fitness for a particular pur
 - controller_interface
 - forward_command_controller
 - hardware_interface
+- control_toolbox
+- geometry_msgs
+- control_msgs
+- realtime_tools
+- tf
+- nav_msgs
 - pluginlib
 
 #### Building
