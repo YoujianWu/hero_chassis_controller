@@ -66,13 +66,13 @@ namespace hero_chassis_controller {
         //through actual velocity of wheels to calculate  velocity of the chassis
         void compute_chassis_vel();
 
-        //odometer pattern
+        //odometry pattern
         ros::Publisher odom_pub;
         tf::TransformBroadcaster odom_broadcaster;
         double x=0.0;
         double y=0.0;
         double th=0.0;//this is orientation of the chassis
-        void odometer();
+        void odometry();
 
 
         //Time Pattern

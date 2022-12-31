@@ -65,8 +65,8 @@ namespace hero_chassis_controller{
         vel_wheel_act[3] = back_right_joint_.getVelocity();
         vel_wheel_act[4] = front_right_joint_.getVelocity();
 
-        //odometry
-        odometer();
+        //start the odometry
+        odometry();
 
         //calculate velocity of the mecanum wheel
         //Through your expected vx vy vw , which is the velocity of the chassis
@@ -129,11 +129,11 @@ namespace hero_chassis_controller{
         vel_wheel_exp[4] = ( Vx + Vy + Vw * ( Wheel_base + Wheel_track )/2 )/ Wheel_R;
     }
     void HeroChassisController::compute_chassis_vel() {
-        Vx_chassis = ( vel_wheel_act[1] + vel_wheel_act[2] + vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R * 2;
-        Vy_chassis = (-vel_wheel_act[1] + vel_wheel_act[2] - vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R * 2;
+        Vx_chassis = ( vel_wheel_act[1] + vel_wheel_act[2] + vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R * 4;
+        Vy_chassis = (-vel_wheel_act[1] + vel_wheel_act[2] - vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R * 4;
         Vw_chassis = (-vel_wheel_act[1] - vel_wheel_act[2] + vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R * 2 / (Wheel_track + Wheel_base);
     }
-    void HeroChassisController::odometer() {
+    void HeroChassisController::odometry() {
 
         current_time = ros::Time::now();
         last_time = ros::Time::now();
