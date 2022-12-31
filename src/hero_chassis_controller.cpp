@@ -49,6 +49,9 @@ namespace hero_chassis_controller{
                 root_nh.subscribe<geometry_msgs::Twist>
                         ("cmd_vel", 1 , &HeroChassisController::return_state,this);
 
+        //start the odom publisher
+        odom_pub = root_nh.advertise<nav_msgs::Odometry>("odom", 50);
+
         return true;
 
     }
@@ -61,6 +64,9 @@ namespace hero_chassis_controller{
         vel_wheel_act[2] = back_left_joint_.getVelocity();
         vel_wheel_act[3] = back_right_joint_.getVelocity();
         vel_wheel_act[4] = front_right_joint_.getVelocity();
+
+        //odometry
+        odometer();
 
         //calculate velocity of the mecanum wheel
         //Through your expected vx vy vw , which is the velocity of the chassis
