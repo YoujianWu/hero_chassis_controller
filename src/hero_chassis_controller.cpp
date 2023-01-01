@@ -67,6 +67,8 @@ namespace hero_chassis_controller{
 
         //start the odometry
         odometry();
+        //start the frame transformation
+        frame_transformation();
 
         //calculate velocity of the mecanum wheel
         //Through your expected vx vy vw , which is the velocity of the chassis
@@ -129,9 +131,9 @@ namespace hero_chassis_controller{
         vel_wheel_exp[4] = ( Vx + Vy + Vw * ( Wheel_base + Wheel_track )/2 )/ Wheel_R;
     }
     void HeroChassisController::compute_chassis_vel() {
-        Vx_chassis = ( vel_wheel_act[1] + vel_wheel_act[2] + vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R * 4;
-        Vy_chassis = (-vel_wheel_act[1] + vel_wheel_act[2] - vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R * 4;
-        Vw_chassis = (-vel_wheel_act[1] - vel_wheel_act[2] + vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R * 2 / (Wheel_track + Wheel_base);
+        Vx_chassis = ( vel_wheel_act[1] + vel_wheel_act[2] + vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R / 4;
+        Vy_chassis = (-vel_wheel_act[1] + vel_wheel_act[2] - vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R / 4;
+        Vw_chassis = (-vel_wheel_act[1] - vel_wheel_act[2] + vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R / 2 / (Wheel_track + Wheel_base);
     }
     void HeroChassisController::odometry() {
 
@@ -190,6 +192,12 @@ namespace hero_chassis_controller{
         odom_pub.publish(odom);
 
         last_time = current_time;
+    }
+    void HeroChassisController::frame_transformation() {
+
+        //first, we will broadcast the transform between "odom" and "base-link"
+        //then, we will use listener to transform the velocity
+
     }
 
 

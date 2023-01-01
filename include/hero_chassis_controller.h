@@ -11,6 +11,7 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <geometry_msgs/Twist.h>
 #include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
 #include <nav_msgs/Odometry.h>
 #include <ros/ros.h>
 
@@ -73,6 +74,15 @@ namespace hero_chassis_controller {
         double y=0.0;
         double th=0.0;//this is orientation of the chassis
         void odometry();
+
+        //frame transformation pattern (from "odom" to "base-link")
+        //transform the expected velocity of the robot (inverse kinematics)
+        tf::TransformBroadcaster frame_broadcaster;
+        tf::TransformListener frame_listener;
+        geometry_msgs::Vector3Stamped vel_in;
+        geometry_msgs::Vector3Stamped vel_out;
+        void frame_transformation();
+
 
 
         //Time Pattern
