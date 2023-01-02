@@ -81,6 +81,9 @@ target_link_libraries(${PROJECT_NAME}
     ${catkin_LIBRARIES}
     )
 
+add_executable(teleop_twist_keyboard src/teleop_twist_keyboard.cpp)
+target_link_libraries(teleop_twist_keyboard ${catkin_LIBRARIES})
+
 
 #############
 ## Install ##
