@@ -37,59 +37,60 @@ namespace hero_chassis_controller {
 
     private:
         //Nodehandle Pattern
-        int loop_count_;
-        std::unique_ptr<realtime_tools::RealtimePublisher<
-                control_msgs::JointControllerState> > controller_state_publisher_ ;
-        //Internal PID controller
-        control_toolbox::Pid pid_controller_1,pid_controller_2,pid_controller_3,pid_controller_4;
+      int loop_count_;
+      std::unique_ptr<
+          realtime_tools::RealtimePublisher<control_msgs::JointControllerState>>
+          controller_state_publisher_;
+      // Internal PID controller
+      control_toolbox::Pid pid_controller_1, pid_controller_2, pid_controller_3,
+          pid_controller_4;
 
-        ros::Subscriber sub_command_;
-        //callback function for subscriber
-        void return_state(const geometry_msgs::TwistConstPtr &state_msg);
+      ros::Subscriber sub_command_;
+      // callback function for subscriber
+      void return_state(const geometry_msgs::TwistConstPtr &state_msg);
 
+      // Mecanum wheels pattern
+      // expected velocity of the chassis(inverse kinematics)
+      double Vx, Vy, Vw;
+      // actual velocity of wheels
+      double vel_wheel_act[5];
+      // expected velocity of four wheels
+      double vel_wheel_exp[5];
+      // comand velocity of four wheels through effort command
+      double wheel_cmd[5];
+      // expected velocity of chassis(forward kinematics)
+      double Vx_chassis, Vy_chassis, Vw_chassis;
+      double Wheel_track;
+      double Wheel_base;
+      double Wheel_R;
+      // through chassis to calculate the motor
+      void compute_mecanum_vel();
+      // through actual velocity of wheels to calculate  velocity of the
+      // chassis
+      void compute_chassis_vel();
 
-        //Mecanum wheels pattern
-        //expected velocity of the chassis(inverse kinematics)
-        double Vx,Vy,Vw;
-        //actual velocity of wheels
-        double vel_wheel_act[5];
-        //expected velocity of four wheels
-        double vel_wheel_exp[5];
-        //comand velocity of four wheels through effort command
-        double wheel_cmd[5];
-        //expected velocity of chassis(forward kinematics)
-        double Vx_chassis,Vy_chassis,Vw_chassis;
-        double Wheel_track;
-        double Wheel_base;
-        double Wheel_R = 0.07625;
-        //through chassis to calculate the motor
-        void compute_mecanum_vel();
-        //through actual velocity of wheels to calculate  velocity of the chassis
-        void compute_chassis_vel();
+      // odometry pattern
+      ros::Publisher odom_pub;
+      tf::TransformBroadcaster odom_broadcaster;
+      double x = 0.0;
+      double y = 0.0;
+      double th = 0.0; // this is orientation of the chassis
+      void odometry(const ros::Time &Time);
 
-        //odometry pattern
-        ros::Publisher odom_pub;
-        tf::TransformBroadcaster odom_broadcaster;
-        double x=0.0;
-        double y=0.0;
-        double th=0.0;//this is orientation of the chassis
-        void odometry(const ros::Time &Time);
+      // frame transformation pattern (from "odom" to "base-link")
+      // transform the expected velocity of the robot (inverse kinematics)
+      tf::TransformBroadcaster frame_broadcaster;
+      tf::TransformListener frame_listener;
+      geometry_msgs::Vector3Stamped vel_in;
+      geometry_msgs::Vector3Stamped vel_out;
+      bool Odom_mode;
+      // this means we can choose different frame to calculate velocity
+      void vel_mode(bool &Mode);
 
-        //frame transformation pattern (from "odom" to "base-link")
-        //transform the expected velocity of the robot (inverse kinematics)
-        tf::TransformBroadcaster frame_broadcaster;
-        tf::TransformListener frame_listener;
-        geometry_msgs::Vector3Stamped vel_in;
-        geometry_msgs::Vector3Stamped vel_out;
-        void frame_transformation();
-
-
-
-        //Time Pattern
-        int state_{};
-        ros::Time current_time;
-        ros::Time last_time;
-
+      // Time Pattern
+      int state_{};
+      ros::Time current_time;
+      ros::Time last_time;
     };
 
 }//namespace hero_chassis_controller
