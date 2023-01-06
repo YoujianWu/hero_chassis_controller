@@ -66,7 +66,7 @@ namespace hero_chassis_controller{
         vel_wheel_act[4] = front_right_joint_.getVelocity();
 
         //start the odometry
-        odometry();
+        odometry(time);
         //start the frame transformation
         frame_transformation();
 
@@ -127,71 +127,75 @@ namespace hero_chassis_controller{
         //wheels's order is anti-clockwise
         vel_wheel_exp[1] = ( Vx - Vy - Vw * ( Wheel_base + Wheel_track )/2 )/ Wheel_R;
         vel_wheel_exp[2] = ( Vx + Vy - Vw * ( Wheel_base + Wheel_track )/2 )/ Wheel_R;
-        vel_wheel_exp[3] = ( Vx - Vy + Vw * ( Wheel_base + Wheel_track )/2 )/ Wheel_R;
-        vel_wheel_exp[4] = ( Vx + Vy + Vw * ( Wheel_base + Wheel_track )/2 )/ Wheel_R;
+        vel_wheel_exp[3] =
+            (Vx - Vy + Vw * (Wheel_base + Wheel_track) / 2) / Wheel_R;
+        vel_wheel_exp[4] =
+            (Vx + Vy + Vw * (Wheel_base + Wheel_track) / 2) / Wheel_R;
     }
     void HeroChassisController::compute_chassis_vel() {
-        Vx_chassis = ( vel_wheel_act[1] + vel_wheel_act[2] + vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R / 4;
-        Vy_chassis = (-vel_wheel_act[1] + vel_wheel_act[2] - vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R / 4;
-        Vw_chassis = (-vel_wheel_act[1] - vel_wheel_act[2] + vel_wheel_act[3] + vel_wheel_act[4] ) / Wheel_R / 2 / (Wheel_track + Wheel_base);
+      Vx_chassis = (vel_wheel_act[1] + vel_wheel_act[2] + vel_wheel_act[3] +
+                    vel_wheel_act[4]) *
+                   Wheel_R / 4;
+      Vy_chassis = (-vel_wheel_act[1] + vel_wheel_act[2] - vel_wheel_act[3] +
+                    vel_wheel_act[4]) *
+                   Wheel_R / 4;
+      Vw_chassis = (-vel_wheel_act[1] - vel_wheel_act[2] + vel_wheel_act[3] +
+                    vel_wheel_act[4]) *
+                   Wheel_R / 2 / (Wheel_track + Wheel_base);
     }
-    void HeroChassisController::odometry() {
+    void HeroChassisController::odometry(const ros::Time &Time) {
 
-        current_time = ros::Time::now();
-        last_time = ros::Time::now();
+      current_time = Time;
+      compute_chassis_vel();
 
-        compute_chassis_vel();
+      // compute odometry in a typical way given the velocities of the robot
+      double dt = (current_time - last_time).toSec();
+      double delta_x = (Vx_chassis * cos(th) - Vy_chassis * sin(th)) * dt;
+      double delta_y = (Vx_chassis * sin(th) + Vy_chassis * cos(th)) * dt;
+      double delta_th = Vw_chassis * dt;
 
-        current_time = ros::Time::now();
+      x += delta_x;
+      y += delta_y;
+      th += delta_th;
 
-        //compute odometry in a typical way given the velocities of the robot
-        double dt = (current_time - last_time).toSec();
-        double delta_x = (Vx_chassis * cos(th) - Vy_chassis * sin(th)) * dt;
-        double delta_y = (Vx_chassis * sin(th) + Vy_chassis * cos(th)) * dt;
-        double delta_th = Vw_chassis * dt;
+      // since all odometry is 6DOF we'll need a quaternion created from yaw
+      geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 
-        x += delta_x;
-        y += delta_y;
-        th += delta_th;
+      // first, we'll publish the transform over tf
+      geometry_msgs::TransformStamped odom_trans;
+      odom_trans.header.stamp = current_time;
+      odom_trans.header.frame_id = "odom";
+      odom_trans.child_frame_id = "base_link";
 
-        //since all odometry is 6DOF we'll need a quaternion created from yaw
-        geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
+      odom_trans.transform.translation.x = x;
+      odom_trans.transform.translation.y = y;
+      odom_trans.transform.translation.z = 0.0;
+      odom_trans.transform.rotation = odom_quat;
 
-        //first, we'll publish the transform over tf
-        geometry_msgs::TransformStamped odom_trans;
-        odom_trans.header.stamp = current_time;
-        odom_trans.header.frame_id = "odom";
-        odom_trans.child_frame_id = "base_link";
+      // send the transform
+      odom_broadcaster.sendTransform(odom_trans);
 
-        odom_trans.transform.translation.x = x;
-        odom_trans.transform.translation.y = y;
-        odom_trans.transform.translation.z = 0.0;
-        odom_trans.transform.rotation = odom_quat;
+      // next, we'll publish the odometry message over ROS
+      nav_msgs::Odometry odom;
+      odom.header.stamp = current_time;
+      odom.header.frame_id = "odom";
 
-        //send the transform
-        odom_broadcaster.sendTransform(odom_trans);
+      // set the position
+      odom.pose.pose.position.x = x;
+      odom.pose.pose.position.y = y;
+      odom.pose.pose.position.z = 0.0;
+      odom.pose.pose.orientation = odom_quat;
 
-        //next, we'll publish the odometry message over ROS
-        nav_msgs::Odometry odom;
-        odom.header.stamp = current_time;
-        odom.header.frame_id = "odom";
+      // set the velocity
+      odom.child_frame_id = "base_link";
+      odom.twist.twist.linear.x = Vx_chassis;
+      odom.twist.twist.linear.y = Vy_chassis;
+      odom.twist.twist.angular.z = Vw_chassis;
 
-        //set the position
-        odom.pose.pose.position.x = x;
-        odom.pose.pose.position.y = y;
-        odom.pose.pose.position.z = 0.0;
-        odom.pose.pose.orientation = odom_quat;
+      // publish the message
+      odom_pub.publish(odom);
 
-        //set the velocity
-        odom.child_frame_id = "base_link";
-        odom.twist.twist.linear.x = Vx_chassis;
-        odom.twist.twist.linear.y = Vy_chassis;
-        odom.twist.twist.angular.z = Vw_chassis;
-
-        //publish the message
-        odom_pub.publish(odom);
-
-        last_time = current_time;
+      last_time = current_time;
     }
     void HeroChassisController::frame_transformation() {
 
