@@ -7,6 +7,8 @@ controller:
     pid_4: { p: 5000.0, i: 100, d: 5.0 }
     Wheel_track: 0.400
     Wheel_base: 0.400
+    Wheel_R: 0.07625
+    Odom_mode: true
 
   joint_state_controller:
     type: joint_state_controller/JointStateController
