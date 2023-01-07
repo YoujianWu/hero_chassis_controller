@@ -44,7 +44,7 @@ using
 
 	cd catkin_workspace/src
 	git clone https://github.com/wuyoujian666/hero_chassis_controller.git
-    # git clone https://github.com/wuyoujian666/hero_chassis_controller.git
+	# git clone https://github.com/wuyoujian666/hero_chassis_controller.git
 	cd ../
 	rosdep install --from-paths . --ignore-src
 	catkin build
@@ -55,11 +55,17 @@ Run the simulation and controller with:
 
 	roslaunch hero_chassis_controller run_simulation_and_controller.launch
 
+Run the keyboard control_node with:
+
+```
+rosrun hero_chassis_controller teleop_twist_keyboard
+```
+
 ## Config files
 
 Config file config
 
-* **controllers.yaml**  Params of hero_chassis_controller and joint_state_controller.
+* **controller.yaml**  Params of hero_chassis_controller and joint_state_controller.
 
 ## Launch files
 
