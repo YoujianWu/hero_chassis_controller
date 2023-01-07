@@ -196,6 +196,25 @@ void HeroChassisController::vel_mode(bool &Mode) {
   // since the odometry has broadcast the transform
   // we just need to realize the second step
   // then, we will use listener to transform the velocity
+
+  // choose the mode of velocity
+  if (Mode) {
+    // fill the relevant message
+    vel_in.header.stamp = ros::Time(0.0);
+    vel_in.header.frame_id = "odom";
+    vel_in.vector.x = Vx;
+    vel_in.vector.y = Vy;
+    vel_in.vector.z = Vw;
+
+    // use the API of the listeners
+    frame_listener.waitForTransform("base_link", "odom", ros::Time(0.0),
+                                    ros::Duration(1.0));
+    frame_listener.transformVector("base_link", vel_in, vel_out);
+
+    Vx = vel_out.vector.x;
+    Vy = vel_out.vector.y;
+    Vw = vel_out.vector.z;
+  }
 }
 
 } // namespace hero_chassis_controller
