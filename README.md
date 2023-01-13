@@ -43,8 +43,8 @@ To build from source, clone the latest version from this repository into your ca
 using
 
 	cd catkin_workspace/src
-	git clone https://github.com/wuyoujian666/hero_chassis_controller.git
-	# git clone https://github.com/wuyoujian666/hero_chassis_controller.git
+	git clone https://github.com/YoujianWu/hero_chassis_controller.git
+	# git clone https://github.com/YoujianWu/hero_chassis_controller.git
 	cd ../
 	rosdep install --from-paths . --ignore-src
 	catkin build
