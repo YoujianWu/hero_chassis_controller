@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a hero chassis controller which is used to control the Robomaster
+This is a hero chassis controller which is used to control the RoboMaster
 hero chassis.
 
 **Keywords:** RoboMaster, ROS, ros_control
